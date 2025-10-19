@@ -1,6 +1,14 @@
 #ifndef _pin_magic_
 #define _pin_magic_
 
+// 74HC595 SHIFT REGISTER CONFIGURATION:
+// A0 (PC0)    -> 74HC595 Pin 14 (DS - Data Serial Input)
+// Pin 8 (PB0) -> 74HC595 Pin 12 (ST_CP - Store Clock Input)
+// Pin 9 (PB1) -> 74HC595 Pin 11 (SH_CP - Shift Clock Input)
+// 74HC595 Pin 13 (OE) -> GND (Output Enable, active LOW)
+// 74HC595 Pin 10 (MR) -> VCC (Master Reset, active LOW)
+// 74HC595 Pin 15 (Q0-Q7) -> TFT Data Bus (D0-D7)
+
 // This header file serves two purposes:
 //
 // 1) Isolate non-portable MCU port- and pin-specific identifiers and
@@ -122,28 +130,35 @@
 
 #else // Uno w/Breakout board
 
+// Write 8-bit value to LCD data lines via 74HC595 shift register
+// A0 (PC0) = DS (Data Serial), Pin 8 (PB0) = ST_CP (Store Clock), Pin 9 (PB1) = SH_CP (Shift Clock)
 #define write8inline(d)                                                        \
   {                                                                            \
-    PORTD = (PORTD & B00000011) | ((d)&B11111100);                             \
-    PORTB = (PORTB & B11111100) | ((d)&B00000011);                             \
+    uint8_t data = (d);                                                        \
+    for (uint8_t i = 0; i < 8; i++) {                                          \
+      PORTC = (PORTC & B11111110) | (data >> 7); /* Set PC0 (A0) */            \
+      PORTB |= B00000010;    /* Set PB1 (pin 9) HIGH */                        \
+      PORTB &= B11111101;    /* Set PB1 (pin 9) LOW */                         \
+      data <<= 1;                                                              \
+    }                                                                          \
+    PORTB |= B00000001;      /* Set PB0 (pin 8) HIGH */                        \
+    PORTB &= B11111110;      /* Set PB0 (pin 8) LOW */                         \
     WR_STROBE;                                                                 \
   }
 #define read8inline(result)                                                    \
   {                                                                            \
-    RD_ACTIVE;                                                                 \
-    DELAY7;                                                                    \
-    result = (PIND & B11111100) | (PINB & B00000011);                          \
-    RD_IDLE;                                                                   \
+    result = 0; /* 74HC595 is output-only, cannot read data */                 \
   }
 #define setWriteDirInline()                                                    \
   {                                                                            \
-    DDRD |= B11111100;                                                         \
-    DDRB |= B00000011;                                                         \
+    DDRC |= B00100000;      /* Set PC5 (A5) as output */                       \
+    DDRB |= B00000011;      /* Set PB0 (pin 8) and PB1 (pin 9) as outputs */   \
+    PORTC &= B11011111;     /* Set PC5 LOW */                                  \
+    PORTB &= B11111100;     /* Set PB0 and PB1 LOW */                          \
   }
 #define setReadDirInline()                                                     \
   {                                                                            \
-    DDRD &= ~B11111100;                                                        \
-    DDRB &= ~B00000011;                                                        \
+    /* No operation - 74HC595 is output-only */                                \
   }
 
 #endif
