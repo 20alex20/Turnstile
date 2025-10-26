@@ -6,6 +6,7 @@
 #include "DoorController.h"
 #include "DistanceSensor.h"
 #include "IDStorage.h"
+#include "Logger.h"
 
 /**
  * Состояния турникета
@@ -38,6 +39,7 @@ private:
     DoorController* door;
     DistanceSensor* distanceSensor;
     IDStorage* idStorage;
+    Logger* logger;
 
     unsigned long stateStartTime;           // Время входа в текущее состояние
     unsigned long lastDistanceMeasureTime;  // Время последнего измерения расстояния
@@ -45,6 +47,12 @@ private:
     
     TurnstileState state;
     Direction direction;
+    
+    // Информация о текущей карте для логирования
+    byte currentUID[10];
+    byte currentUIDSize;
+    bool currentAllowed;
+    bool currentPassed;
     
     // Таймеры для различных состояний
     static const unsigned long TIMER_PASSAGE = 15000;           // 15 сек на проход
@@ -100,7 +108,7 @@ public:
      */
     Turnstile(RFIDReader* rfidEntry, RFIDReader* rfidExit, 
               Display* display, DoorController* door,
-              DistanceSensor* distanceSensor, IDStorage* idStorage);
+              DistanceSensor* distanceSensor, IDStorage* idStorage, Logger* logger);
     
     /**
      * Инициализация турникета

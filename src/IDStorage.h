@@ -34,6 +34,33 @@ public:
      * @return true, если ID найден в файле
      */
     bool isIDAllowed(byte* uid, byte uidSize);
+    
+    /**
+     * Добавить ID в файл
+     * @param uid - массив с UID
+     * @param uidSize - размер UID
+     * @return true, если успешно добавлен
+     */
+    bool addID(byte* uid, byte uidSize);
+    
+    /**
+     * Удалить ID из файла
+     * @param uid - массив с UID
+     * @param uidSize - размер UID
+     * @return true, если успешно удален
+     */
+    bool removeID(byte* uid, byte uidSize);
+    
+    /**
+     * Получить все ID из файла
+     * @return строка со всеми ID
+     */
+    String getAllIDs();
+    
+    /**
+     * Очистить файл ids.data
+     */
+    void clearAll();
 };
 
 #endif

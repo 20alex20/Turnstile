@@ -6,6 +6,9 @@
 #include "../DistanceSensor.h"
 #include "../IDStorage.h"
 #include "../Turnstile.h"
+#include "../TimeManager.h"
+#include "../Logger.h"
+#include "../CommandHandler.h"
 
 // Пины для TFT LCD (через 74HC595)
 #define LCD_CS A3
@@ -36,11 +39,21 @@ Display* display;
 DoorController* door;
 DistanceSensor* distanceSensor;
 IDStorage* idStorage;
+TimeManager* timeManager;
+Logger* logger;
+CommandHandler* commandHandler;
 Turnstile* turnstile;
+
+String serialBuffer = "";
 
 void setup() {
     Serial.begin(9600);
     delay(100);
+    
+    // Инициализация TimeManager и запрос времени
+    Serial.println("Initializing time manager...");
+    timeManager = new TimeManager();
+    timeManager->requestDateTime();
     
     // Инициализация SPI для SD и RFID
     Serial.println("Initializing SPI...");
@@ -60,6 +73,17 @@ void setup() {
         while (1); // Остановка программы
     }
     Serial.println("SD card initialized");
+    
+    // Инициализация Logger
+    Serial.println("Initializing logger...");
+    logger = new Logger("logs.txt", timeManager);
+    logger->init();
+    Serial.println("Logger initialized");
+    
+    // Инициализация CommandHandler
+    Serial.println("Initializing command handler...");
+    commandHandler = new CommandHandler(idStorage, logger);
+    Serial.println("Command handler initialized");
     
     // Инициализация RFID модулей
     Serial.println("Initializing RFID readers...");
@@ -83,13 +107,27 @@ void setup() {
     
     // Создание и инициализация турникета
     Serial.println("Creating turnstile system...");
-    turnstile = new Turnstile(rfidEntry, rfidExit, display, door, distanceSensor, idStorage);
+    turnstile = new Turnstile(rfidEntry, rfidExit, display, door, distanceSensor, idStorage, logger);
     turnstile->init();
     
     Serial.println("Turnstile system ready!");
 }
 
 void loop() {
+    // Обработка команды из Serial
+    while (Serial.available()) {
+        char c = Serial.read();
+        if (c == '\n') {
+            if (serialBuffer.length() > 0) {
+                commandHandler->handleCommand(serialBuffer);
+                serialBuffer = "";
+            }
+        } else if (c >= 32 && c <= 126) {  // Печатные символы
+            serialBuffer += c;
+        }
+    }
+    
+    // Основной цикл турникета
     turnstile->loop();
     delay(1); // Небольшая задержка для стабильности
 }

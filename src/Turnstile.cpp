@@ -2,17 +2,21 @@
 
 Turnstile::Turnstile(RFIDReader* rfidEntry, RFIDReader* rfidExit, 
               Display* display, DoorController* door,
-              DistanceSensor* distanceSensor, IDStorage* idStorage) {
+              DistanceSensor* distanceSensor, IDStorage* idStorage, Logger* logger) {
     this->rfidEntry = rfidEntry;
     this->rfidExit = rfidExit;
     this->display = display;
     this->door = door;
     this->distanceSensor = distanceSensor;
     this->idStorage = idStorage;
+    this->logger = logger;
     this->state = STATE_WAITING;
     this->stateStartTime = 0;
     this->lastDistanceMeasureTime = 0;
     this->baseDistance = 0;
+    this->currentUIDSize = 0;
+    this->currentAllowed = false;
+    this->currentPassed = false;
 }
 
 void Turnstile::init() {
@@ -66,14 +70,24 @@ void Turnstile::handleWaiting() {
     
     // Проверяем передний RFID (вход)
     if (rfidEntry->isCardPresent() && rfidEntry->readCardID(uid, uidSize)) {
+        // Сохраняем информацию для логирования
+        for (byte i = 0; i < uidSize; i++) {
+            currentUID[i] = uid[i];
+        }
+        currentUIDSize = uidSize;
+        currentAllowed = idStorage->isIDAllowed(uid, uidSize);
+        currentPassed = false;
+        
         // Проверяем ID в базе
-        if (idStorage->isIDAllowed(uid, uidSize)) {
+        if (currentAllowed) {
             direction = DIR_ENTRY;
             setState(STATE_PASSAGE_WAITING);
             display->showWelcomeMessage();
             door->openForEntry();
             return;
         } else {
+            // Логируем "Проход запрещен"
+            logger->log(currentUID, currentUIDSize, false, false);
             setState(STATE_ACCESS_DENIED);
             display->showAccessDeniedMessage();
             return;
@@ -82,14 +96,24 @@ void Turnstile::handleWaiting() {
 
     // Проверяем задний RFID (выход)
     if (rfidExit->isCardPresent() && rfidExit->readCardID(uid, uidSize)) {
+        // Сохраняем информацию для логирования
+        for (byte i = 0; i < uidSize; i++) {
+            currentUID[i] = uid[i];
+        }
+        currentUIDSize = uidSize;
+        currentAllowed = idStorage->isIDAllowed(uid, uidSize);
+        currentPassed = false;
+        
         // Проверяем ID в базе
-        if (idStorage->isIDAllowed(uid, uidSize)) {
+        if (currentAllowed) {
             direction = DIR_EXIT;
             setState(STATE_PASSAGE_WAITING);
             display->showGoodbyeMessage();
             door->openForExit();
             return;
         } else {
+            // Логируем "Проход запрещен"
+            logger->log(currentUID, currentUIDSize, false, false);
             setState(STATE_ACCESS_DENIED);
             display->showAccessDeniedMessage();
             return;
@@ -103,6 +127,8 @@ void Turnstile::handlePassageWaiting() {
     // Проверяем, не истекло ли время ожидания
     if (elapsed >= TIMER_PASSAGE) {
         // Время истекло, проход не был осуществлен
+        currentPassed = false;
+        logger->log(currentUID, currentUIDSize, true, false);
         setState(STATE_ERROR_MESSAGE);
         display->showNoPassageMessage();
         door->closeDoor();
@@ -130,7 +156,9 @@ void Turnstile::handlePassageDetected() {
     
     // Проверяем, не истекло ли время ожидания
     if (elapsed >= TIMER_PASSAGE_DETECTED) {
-        // Проход завершен, запускаем закрытие двери
+        // Проход завершен, логируем успешный проход
+        currentPassed = true;
+        logger->log(currentUID, currentUIDSize, true, true);
         setState(STATE_CLOSING);
         return;
     }
