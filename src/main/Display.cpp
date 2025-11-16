@@ -1,5 +1,4 @@
 #include "Display.h"
-#include <Arduino.h>
 
 #define LCD_RD A0
 

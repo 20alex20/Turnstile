@@ -110,14 +110,32 @@ bool IDStorage::removeID(byte* uid, byte uidSize) {
     
     file.close();
     tempFile.close();
-    
+
     if (found) {
         SD.remove(filename);
-        SD.rename(tempFileName.c_str(), filename);
-    } else {
-        SD.remove(tempFileName.c_str());
+
+        File file = SD.open(filename, FILE_WRITE);
+        if (!file) {
+            return false;
+        }
+
+        File tempFile = SD.open(tempFileName.c_str(), FILE_READ);
+        if (!tempFile) {
+            file.close();
+            return false;
+        }
+
+        // копируем
+        while (tempFile.available()) {
+            file.write(tempFile.read());
+        }
+
+        file.close();
+        tempFile.close();
     }
-    
+
+    SD.remove(tempFileName.c_str());
+
     return found;
 }
 

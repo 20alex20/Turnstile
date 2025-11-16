@@ -1,5 +1,5 @@
 #include "CommandHandler.h"
-#include <Arduino.h>
+#include <SD.h>
 
 CommandHandler::CommandHandler(IDStorage* idStorage, Logger* logger) {
     this->idStorage = idStorage;
@@ -83,7 +83,7 @@ void CommandHandler::handleCommand(const String& command) {
     
     if (cmd == "get logs") {
         // Читаем и отправляем все логи
-        File file = SD.open("logs.txt", FILE_READ);
+        File file = SD.open(logger->filename, FILE_READ);
         if (file) {
             while (file.available()) {
                 String line = file.readStringUntil('\n');
@@ -133,7 +133,7 @@ void CommandHandler::handleCommand(const String& command) {
         
     } else if (cmd == "clear logs") {
         // Очищаем логи
-        SD.remove("logs.txt");
+        SD.remove(logger->filename);
         Serial.println("OK");
         
     } else if (cmd == "clear ids") {
@@ -155,4 +155,3 @@ void CommandHandler::handleCommand(const String& command) {
         Serial.println("ERROR: Unknown command");
     }
 }
-

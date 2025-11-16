@@ -1,6 +1,7 @@
 #ifndef DOORCONTROLLER_H
 #define DOORCONTROLLER_H
 
+#include <Arduino.h>
 #include <Servo.h>
 
 /**
@@ -41,11 +42,6 @@ public:
      * Закрыть дверь (90 градусов)
      */
     void closeDoor();
-    
-    /**
-     * Получить текущую позицию
-     */
-    uint8_t getPosition() const { return currentPosition; }
 };
 
 #endif

@@ -1,5 +1,4 @@
 #include "DistanceSensor.h"
-#include <Arduino.h>
 
 DistanceSensor::DistanceSensor(uint8_t trigPin, uint8_t echoPin) {
     this->trigPin = trigPin;

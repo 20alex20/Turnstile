@@ -1,6 +1,7 @@
 #ifndef RFIDREADER_H
 #define RFIDREADER_H
 
+#include <Arduino.h>
 #include <MFRC522.h>
 
 /**

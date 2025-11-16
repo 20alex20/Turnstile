@@ -1,14 +1,14 @@
 #include <SPI.h>
 
-#include "../RFIDReader.h"
-#include "../Display.h"
-#include "../DoorController.h"
-#include "../DistanceSensor.h"
-#include "../IDStorage.h"
-#include "../Turnstile.h"
-#include "../TimeManager.h"
-#include "../Logger.h"
-#include "../CommandHandler.h"
+#include "RFIDReader.h"
+#include "Display.h"
+#include "DoorController.h"
+#include "DistanceSensor.h"
+#include "IDStorage.h"
+#include "Turnstile.h"
+#include "TimeManager.h"
+#include "Logger.h"
+#include "CommandHandler.h"
 
 // Пины для TFT LCD (через 74HC595)
 #define LCD_CS A3
@@ -17,14 +17,14 @@
 #define LCD_RESET A4
 
 // Пины для RFID модулей
-#define RFID_ENTRY_SS 2
-#define RFID_ENTRY_RST 3
-#define RFID_EXIT_SS 4
-#define RFID_EXIT_RST 5
+#define RFID_ENTRY_SS 7
+#define RFID_ENTRY_RST 6
+#define RFID_EXIT_SS 5
+#define RFID_EXIT_RST 4
 
 // Пины для дальномера
-#define TRIG_PIN 6
-#define ECHO_PIN 7
+#define TRIG_PIN 3
+#define ECHO_PIN 2
 
 // Пин для сервопривода
 #define SERVO_PIN A5
@@ -43,8 +43,6 @@ TimeManager* timeManager;
 Logger* logger;
 CommandHandler* commandHandler;
 Turnstile* turnstile;
-
-String serialBuffer = "";
 
 void setup() {
     Serial.begin(9600);
@@ -77,7 +75,6 @@ void setup() {
     // Инициализация Logger
     Serial.println("Initializing logger...");
     logger = new Logger("logs.txt", timeManager);
-    logger->init();
     Serial.println("Logger initialized");
     
     // Инициализация CommandHandler
@@ -112,6 +109,8 @@ void setup() {
     
     Serial.println("Turnstile system ready!");
 }
+
+String serialBuffer = "";
 
 void loop() {
     // Обработка команды из Serial

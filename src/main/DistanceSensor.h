@@ -1,6 +1,8 @@
 #ifndef DISTANCESENSOR_H
 #define DISTANCESENSOR_H
 
+#include <Arduino.h>
+
 /**
  * Класс для управления ультразвуковым дальномером HC-SR04
  */

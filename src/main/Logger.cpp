@@ -1,14 +1,10 @@
 #include "Logger.h"
-#include <Arduino.h>
+#include <SD.h>
 
 Logger::Logger(const char* filename, TimeManager* timeManager) {
     this->filename = filename;
     this->timeManager = timeManager;
     this->serialLogging = false;
-}
-
-void Logger::init() {
-    // Файл логов создается автоматически при первой записи
 }
 
 String Logger::formatCardID(byte* uid, byte uidSize) {
@@ -27,7 +23,7 @@ String Logger::formatCardID(byte* uid, byte uidSize) {
     return str;
 }
 
-void Logger::log(byte* uid, byte uidSize, bool allowed, bool passed) {
+void Logger::log(byte* uid, byte uidSize, bool allowed, bool direcyionEntry, bool passed) {
     // Получаем текущее время
     DateTime dt;
     timeManager->getCurrentDateTime(dt);
@@ -38,14 +34,20 @@ void Logger::log(byte* uid, byte uidSize, bool allowed, bool passed) {
     
     // Создаем строку лога
     String logLine = timestamp + " " + cardID + " : ";
-    
+
+    if (direcyionEntry) {
+        logLine += "Вход ";
+    } else {
+        logLine += "Выход ";
+    }
+
     if (allowed) {
-        logLine += "Проход разрешен";
+        logLine += "разрешен";
         if (!passed) {
             logLine += " НЕ ПРОШЕЛ";
         }
     } else {
-        logLine += "Проход запрещен";
+        logLine += "запрещен";
     }
     
     // Отправляем в Serial, если включено
@@ -65,4 +67,3 @@ void Logger::log(byte* uid, byte uidSize, bool allowed, bool passed) {
 void Logger::setSerialLogging(bool enabled) {
     serialLogging = enabled;
 }
-

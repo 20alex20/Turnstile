@@ -1,6 +1,7 @@
 #ifndef TURNSTILE_H
 #define TURNSTILE_H
 
+#include <Arduino.h>
 #include "RFIDReader.h"
 #include "Display.h"
 #include "DoorController.h"
@@ -49,10 +50,8 @@ private:
     Direction direction;
     
     // Информация о текущей карте для логирования
-    byte currentUID[10];
-    byte currentUIDSize;
-    bool currentAllowed;
-    bool currentPassed;
+    byte uid[10];
+    byte uidSize;
     
     // Таймеры для различных состояний
     static const unsigned long TIMER_PASSAGE = 15000;           // 15 сек на проход

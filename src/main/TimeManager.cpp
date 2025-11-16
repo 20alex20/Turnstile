@@ -3,7 +3,7 @@
 TimeManager::TimeManager() {
     startTime.day = 1;
     startTime.month = 1;
-    startTime.year = 2024;
+    startTime.year = 2025;
     startTime.hour = 0;
     startTime.minute = 0;
     startTime.second = 0;
@@ -11,8 +11,8 @@ TimeManager::TimeManager() {
 }
 
 void TimeManager::requestDateTime() {
-    Serial.println("Please enter current date and time (format: DD:MM:YYYY HH:MM:SS)");
-    Serial.println("Example: 25:12:2024 14:30:00");
+    Serial.println("Please enter current date and time (format: DD.MM.YYYY HH:MM:SS)");
+    Serial.println("Example: 25.12.2024 14:30:00");
     Serial.print("> ");
     
     while (!Serial.available()) {
@@ -22,16 +22,16 @@ void TimeManager::requestDateTime() {
     String input = Serial.readString();
     input.trim();
     
-    // Парсинг строки "DD:MM:YYYY HH:MM:SS"
+    // Парсинг строки "DD.MM.YYYY HH:MM:SS"
     if (input.length() >= 19) {
         // День
         startTime.day = (input.charAt(0) - '0') * 10 + (input.charAt(1) - '0');
         // Месяц
         startTime.month = (input.charAt(3) - '0') * 10 + (input.charAt(4) - '0');
         // Год
-        startTime.year = (input.charAt(6) - '0') * 1000 + 
-                        (input.charAt(7) - '0') * 100 + 
-                        (input.charAt(8) - '0') * 10 + 
+        startTime.year = (input.charAt(6) - '0') * 1000 +
+                        (input.charAt(7) - '0') * 100 +
+                        (input.charAt(8) - '0') * 10 +
                         (input.charAt(9) - '0');
         // Час
         startTime.hour = (input.charAt(11) - '0') * 10 + (input.charAt(12) - '0');
@@ -101,16 +101,17 @@ void TimeManager::getCurrentDateTime(DateTime& dt) {
     // Простой расчет дней в месяце
     uint8_t daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     bool isLeapYear = (dt.year % 4 == 0 && (dt.year % 100 != 0 || dt.year % 400 == 0));
-    if (isLeapYear && dt.month == 2) {
-        daysInMonth[1] = 29;
-    }
-    
     while (dt.day > daysInMonth[dt.month - 1]) {
         dt.day -= daysInMonth[dt.month - 1];
         dt.month++;
         if (dt.month > 12) {
             dt.month = 1;
             dt.year++;
+            if (dt.year % 4 == 0 && (dt.year % 100 != 0 || dt.year % 400 == 0)) {
+                daysInMonth[1] = 29;
+            } else {
+                daysInMonth[1] = 28;
+            }
         }
     }
 }
@@ -121,12 +122,12 @@ String TimeManager::formatDateTime(const DateTime& dt) {
     // День
     if (dt.day < 10) str += "0";
     str += dt.day;
-    str += ":";
+    str += ".";
     
     // Месяц
     if (dt.month < 10) str += "0";
     str += dt.month;
-    str += ":";
+    str += ".";
     
     // Год
     str += dt.year;
@@ -148,4 +149,3 @@ String TimeManager::formatDateTime(const DateTime& dt) {
     
     return str;
 }
-

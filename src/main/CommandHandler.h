@@ -1,7 +1,7 @@
 #ifndef COMMANDHANDLER_H
 #define COMMANDHANDLER_H
 
-#include <SD.h>
+#include <Arduino.h>
 #include "IDStorage.h"
 #include "Logger.h"
 
@@ -40,4 +40,3 @@ public:
 };
 
 #endif
-

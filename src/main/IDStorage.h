@@ -1,6 +1,8 @@
 #ifndef IDSTORAGE_H
 #define IDSTORAGE_H
 
+#include <Arduino.h>
+
 /**
  * Класс для работы с файлом разрешенных ID карт на SD карте
  */
