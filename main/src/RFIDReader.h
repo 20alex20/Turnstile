@@ -25,17 +25,6 @@ public:
     RFIDReader(uint8_t ssPin, uint8_t rstPin);
     
     /**
-     * Инициализация модуля
-     */
-    void init();
-    
-    /**
-     * Проверка наличия новой карты
-     * @return true, если обнаружена карта
-     */
-    bool isCardPresent();
-    
-    /**
      * Чтение ID карты
      * @param uid - массив для записи UID (до 10 байт)
      * @param uidSize - размер массива uid

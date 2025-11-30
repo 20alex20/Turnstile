@@ -23,9 +23,9 @@ void Display::showWaitingMessage() {
     tft->setCursor(40, 100);
     tft->setTextColor(COLOR_WHITE);
     tft->setTextSize(3);
-    tft->println("  Приложите");
+    tft->print(F("  Приложите"));
     tft->setCursor(40, 150);
-    tft->println("     карту");
+    tft->print(F("     карту"));
 }
 
 void Display::showWelcomeMessage() {
@@ -33,9 +33,9 @@ void Display::showWelcomeMessage() {
     tft->setCursor(30, 100);
     tft->setTextColor(COLOR_BLACK);
     tft->setTextSize(3);
-    tft->println("Добро");
+    tft->print(F("Добро"));
     tft->setCursor(30, 150);
-    tft->println("пожаловать");
+    tft->print(F("пожаловать"));
 }
 
 void Display::showGoodbyeMessage() {
@@ -43,9 +43,9 @@ void Display::showGoodbyeMessage() {
     tft->setCursor(30, 100);
     tft->setTextColor(COLOR_BLACK);
     tft->setTextSize(3);
-    tft->println("До");
+    tft->print(F("До"));
     tft->setCursor(20, 150);
-    tft->println("свидания");
+    tft->print(F("свидания"));
 }
 
 void Display::showAccessDeniedMessage() {
@@ -53,9 +53,9 @@ void Display::showAccessDeniedMessage() {
     tft->setCursor(20, 100);
     tft->setTextColor(COLOR_WHITE);
     tft->setTextSize(2);
-    tft->println("Проход");
+    tft->print(F("Проход"));
     tft->setCursor(30, 130);
-    tft->println("запрещен");
+    tft->print(F("запрещен"));
 }
 
 void Display::showNoPassageMessage() {
@@ -63,7 +63,7 @@ void Display::showNoPassageMessage() {
     tft->setCursor(5, 100);
     tft->setTextColor(COLOR_BLACK);
     tft->setTextSize(2);
-    tft->println("Проход не");
+    tft->print(F("Проход не"));
     tft->setCursor(5, 130);
-    tft->println("был осуществлен");
+    tft->print(F("был осуществлен"));
 }

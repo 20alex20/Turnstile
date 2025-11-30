@@ -1,12 +1,7 @@
 #include "DoorController.h"
 
-DoorController::DoorController(uint8_t pin) {
-    this->pin = pin;
-}
-
-void DoorController::init() {
+DoorController::DoorController(uint8_t pin) : pin(pin) {
     servo.attach(pin);
-    closeDoor();
 }
 
 void DoorController::openForEntry() {

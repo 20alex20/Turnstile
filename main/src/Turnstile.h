@@ -56,7 +56,6 @@ private:
     // Таймеры для различных состояний
     static const unsigned long TIMER_PASSAGE = 15000;           // 15 сек на проход
     static const unsigned long TIMER_CLOSING = 5000;            // 5 сек на закрытие
-    static const unsigned long TIMER_ERROR = 5000;              // 5 сек на ошибку
     static const unsigned long TIMER_PASSAGE_DETECTED = 1000;   // 1 сек после детектирования прохода
     static const unsigned long DISTANCE_MEASURE_INTERVAL = 10;  // Интервал измерения расстояния (10 мс)
 
@@ -77,19 +76,11 @@ private:
     void handlePassageDetected();
     
     /**
+     * Обработка состояния "Показ сообщения об ошибке"
+     * Обработка состояния "Доступ запрещен"
      * Обработка состояния "Закрытие двери"
      */
     void handleClosing();
-    
-    /**
-     * Обработка состояния "Показ сообщения об ошибке"
-     */
-    void handleErrorMessage();
-    
-    /**
-     * Обработка состояния "Доступ запрещен"
-     */
-    void handleAccessDenied();
     
     /**
      * Переход в состояние
@@ -108,11 +99,6 @@ public:
     Turnstile(RFIDReader* rfidEntry, RFIDReader* rfidExit, 
               Display* display, DoorController* door,
               DistanceSensor* distanceSensor, IDStorage* idStorage, Logger* logger);
-    
-    /**
-     * Инициализация турникета
-     */
-    void init();
     
     /**
      * Основной цикл обработки

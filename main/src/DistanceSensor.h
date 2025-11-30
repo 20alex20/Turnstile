@@ -20,11 +20,6 @@ public:
     DistanceSensor(uint8_t trigPin, uint8_t echoPin);
     
     /**
-     * Инициализация датчика
-     */
-    void init();
-    
-    /**
      * Измерение расстояния
      * @return расстояние в см (0 если ошибка)
      */

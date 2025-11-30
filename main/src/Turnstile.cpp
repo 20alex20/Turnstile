@@ -16,23 +16,21 @@ Turnstile::Turnstile(RFIDReader* rfidEntry, RFIDReader* rfidExit,
     this->baseDistance = 0;
     this->state = STATE_WAITING;
     this->uidSize = 0;
-}
 
-void Turnstile::init() {
     // Инициализация дисплея
     display->init();
-    
+
     // Показать начальное сообщение
     display->showWaitingMessage();
-    
+
     // Закрыть дверь
     door->closeDoor();
-    
+
     // Калибровать дальномер
     baseDistance = distanceSensor->calibrate();
-    
+
     // Установить начальное состояние
-    setState(STATE_WAITING);
+    stateStartTime = millis();
 }
 
 void Turnstile::loop() {
@@ -47,13 +45,9 @@ void Turnstile::loop() {
             handlePassageDetected();
             break;
         case STATE_CLOSING:
-            handleClosing();
-            break;
         case STATE_ERROR_MESSAGE:
-            handleErrorMessage();
-            break;
         case STATE_ACCESS_DENIED:
-            handleAccessDenied();
+            handleClosing();
             break;
     }
 }
@@ -67,21 +61,22 @@ void Turnstile::handleWaiting() {
     bool cardReady = false;
 
     // Проверяем передний RFID (вход)
-    if (rfidEntry->isCardPresent() && rfidEntry->readCardID(uid, uidSize)) {
+    if (rfidEntry->readCardID(uid, uidSize)) {
         direction = DIR_ENTRY;
         cardReady = false;
+        door->openForEntry();
     }
     // Проверяем задний RFID (выход)
-    else if (rfidExit->isCardPresent() && rfidExit->readCardID(uid, uidSize)) {
+    else if (rfidExit->readCardID(uid, uidSize)) {
         direction = DIR_EXIT;
         cardReady = false;
+        door->openForExit();
     }
 
     if (cardReady) {
         if (idStorage->isIDAllowed(uid, uidSize)) {
             setState(STATE_PASSAGE_WAITING);
             display->showGoodbyeMessage();
-            door->openForExit();
         } else {
             // Логируем "Проход запрещен"
             logger->log(uid, uidSize, false, direction == DIR_ENTRY, false);
@@ -92,10 +87,8 @@ void Turnstile::handleWaiting() {
 }
 
 void Turnstile::handlePassageWaiting() {
-    unsigned long elapsed = millis() - stateStartTime;
-    
     // Проверяем, не истекло ли время ожидания
-    if (elapsed >= TIMER_PASSAGE) {
+    if (millis() - stateStartTime >= TIMER_PASSAGE) {
         // Время истекло, проход не был осуществлен
         logger->log(uid, uidSize, true, direction == DIR_ENTRY, false);
         setState(STATE_ERROR_MESSAGE);
@@ -109,22 +102,11 @@ void Turnstile::handlePassageWaiting() {
 }
 
 void Turnstile::handlePassageDetected() {
-    unsigned long elapsed = millis() - stateStartTime;
-    
     // Измеряем расстояние каждые 10 мс
-    if (millis() - lastDistanceMeasureTime >= DISTANCE_MEASURE_INTERVAL) {
-        float currentDistance = distanceSensor->measureDistance();
-        
-        if (currentDistance > 0 && currentDistance < baseDistance * 0.95) {
-            // Все еще регистрируется проход, сбрасываем таймер
-            setState(STATE_PASSAGE_DETECTED);
-        }
-        
-        lastDistanceMeasureTime = millis();
-    }
+    checkPassage();
     
     // Проверяем, не истекло ли время ожидания
-    if (elapsed >= TIMER_PASSAGE_DETECTED) {
+    if (millis() - stateStartTime >= TIMER_PASSAGE_DETECTED) {
         // Проход завершен, логируем успешный проход
         logger->log(uid, uidSize, true, direction == DIR_ENTRY, true);
         setState(STATE_CLOSING);
@@ -133,48 +115,26 @@ void Turnstile::handlePassageDetected() {
 }
 
 void Turnstile::handleClosing() {
-    unsigned long elapsed = millis() - stateStartTime;
-    
-    if (elapsed >= TIMER_CLOSING) {
+    if (millis() - stateStartTime >= TIMER_CLOSING) {
+        // Время показа ошибки истекло
+        // Время показа сообщения истекло
         // Время на закрытие истекло, возвращаемся в режим ожидания
         setState(STATE_WAITING);
         display->showWaitingMessage();
     }
 }
 
-void Turnstile::handleErrorMessage() {
-    unsigned long elapsed = millis() - stateStartTime;
-
-    if (elapsed >= TIMER_ERROR) {
-        // Время показа ошибки истекло
-        setState(STATE_WAITING);
-        display->showWaitingMessage();
-    }
-}
-
-void Turnstile::handleAccessDenied() {
-    unsigned long elapsed = millis() - stateStartTime;
-
-    if (elapsed >= TIMER_ERROR) {
-        // Время показа сообщения истекло
-        setState(STATE_WAITING);
-        display->showWaitingMessage();
-    }
-}
-
 void Turnstile::checkPassage() {
-    if (millis() - lastDistanceMeasureTime < DISTANCE_MEASURE_INTERVAL) {
-        return;
-    }
-    
-    float currentDistance = distanceSensor->measureDistance();
+    if (millis() - lastDistanceMeasureTime >= DISTANCE_MEASURE_INTERVAL) {
+        float currentDistance = distanceSensor->measureDistance();
 
-    // Проверяем, уменьшилось ли расстояние от базового
-    // Человек проходит, когда расстояние становится меньше базового
-    if (currentDistance > 0 && currentDistance < baseDistance * 0.95) {
-        // Обнаружен проход - человек вошел в зону
-        setState(STATE_PASSAGE_DETECTED);
+        // Проверяем, уменьшилось ли расстояние от базового
+        // Человек проходит, когда расстояние становится меньше базового
+        if (currentDistance > 0 && currentDistance < baseDistance * 0.95) {
+            // Обнаружен проход - человек вошел в зону
+            setState(STATE_PASSAGE_DETECTED);
+        }
+
+        lastDistanceMeasureTime = millis();
     }
-    
-    lastDistanceMeasureTime = millis();
 }

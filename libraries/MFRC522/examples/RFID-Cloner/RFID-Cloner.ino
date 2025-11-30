@@ -184,7 +184,7 @@ void keuze2(){ //Test waardes in blokken
       block ++;
     }
   
-  Serial.print(F("Writing data into block ")); 
+  Serial.print(F("Writing data into block "));
   Serial.print(block);
   Serial.println("\n");
   
@@ -255,7 +255,7 @@ Serial.println("Insert new card...");
     }
     
     // Write data to the block
-    Serial.print(F("Writing data into block ")); 
+    Serial.print(F("Writing data into block "));
     Serial.print(block);
     Serial.println("\n");
           

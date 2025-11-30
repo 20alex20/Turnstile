@@ -3,9 +3,6 @@
 DistanceSensor::DistanceSensor(uint8_t trigPin, uint8_t echoPin) {
     this->trigPin = trigPin;
     this->echoPin = echoPin;
-}
-
-void DistanceSensor::init() {
     pinMode(trigPin, OUTPUT);
     pinMode(echoPin, INPUT);
     digitalWrite(trigPin, LOW);
@@ -13,18 +10,13 @@ void DistanceSensor::init() {
 
 float DistanceSensor::measureDistance() {
     // Отправляем короткий импульс
-    digitalWrite(trigPin, LOW);
-    delayMicroseconds(2);
     digitalWrite(trigPin, HIGH);
     delayMicroseconds(10);
     digitalWrite(trigPin, LOW);
     
     // Измеряем время прихода эха
-    unsigned long duration = pulseIn(echoPin, HIGH);
-    
     // Рассчитываем расстояние (скорость звука 343 м/с)
-    float distance = duration * 0.0343 / 2.0;
-    return distance;
+    return pulseIn(echoPin, HIGH) * 0.01715;
 }
 
 float DistanceSensor::calibrate() {

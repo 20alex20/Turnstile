@@ -1,14 +1,11 @@
 #include <SPI.h>
-
-#include "RFIDReader.h"
-#include "Display.h"
-#include "DoorController.h"
-#include "DistanceSensor.h"
-#include "IDStorage.h"
-#include "Turnstile.h"
-#include "TimeManager.h"
-#include "Logger.h"
-#include "CommandHandler.h"
+#include "src/RFIDReader.h"
+#include "src/Display.h"
+#include "src/DoorController.h"
+#include "src/DistanceSensor.h"
+#include "src/IDStorage.h"
+#include "src/Turnstile.h"
+#include "src/Logger.h"
 
 // Пины для TFT LCD (через 74HC595)
 #define LCD_CS A3
@@ -39,90 +36,60 @@ Display* display;
 DoorController* door;
 DistanceSensor* distanceSensor;
 IDStorage* idStorage;
-TimeManager* timeManager;
 Logger* logger;
-CommandHandler* commandHandler;
 Turnstile* turnstile;
 
 void setup() {
     Serial.begin(9600);
     delay(100);
-    
-    // Инициализация TimeManager и запрос времени
-    Serial.println("Initializing time manager...");
-    timeManager = new TimeManager();
-    timeManager->requestDateTime();
-    
+
     // Инициализация SPI для SD и RFID
-    Serial.println("Initializing SPI...");
     SPI.begin();
-    
+
     // Инициализация дисплея
-    Serial.println("Initializing display...");
     display = new Display(LCD_CS, LCD_CD, LCD_WR, LCD_RESET);
-    display->init();
-    Serial.println("TFT display initialized");
-    
+
     // Инициализация SD карты
-    Serial.println("Initializing SD card...");
     idStorage = new IDStorage("ids.data", SD_CS);
     if (!idStorage->init()) {
-        Serial.println("SD card initialization failed!");
         while (1); // Остановка программы
     }
-    Serial.println("SD card initialized");
-    
+
     // Инициализация Logger
-    Serial.println("Initializing logger...");
-    logger = new Logger("logs.txt", timeManager);
-    Serial.println("Logger initialized");
-    
-    // Инициализация CommandHandler
-    Serial.println("Initializing command handler...");
-    commandHandler = new CommandHandler(idStorage, logger);
-    Serial.println("Command handler initialized");
-    
+    logger = new Logger("logs.txt");
+    logger->requestDateTime();
+
     // Инициализация RFID модулей
-    Serial.println("Initializing RFID readers...");
     rfidEntry = new RFIDReader(RFID_ENTRY_SS, RFID_ENTRY_RST);
     rfidExit = new RFIDReader(RFID_EXIT_SS, RFID_EXIT_RST);
-    rfidEntry->init();
-    rfidExit->init();
-    Serial.println("RFID readers initialized");
-    
+
     // Инициализация дальномера
-    Serial.println("Initializing distance sensor...");
     distanceSensor = new DistanceSensor(TRIG_PIN, ECHO_PIN);
-    distanceSensor->init();
-    Serial.println("Distance sensor initialized");
-    
+
     // Инициализация сервопривода
-    Serial.println("Initializing door controller...");
     door = new DoorController(SERVO_PIN);
-    door->init();
-    Serial.println("Door controller initialized");
-    
+
     // Создание и инициализация турникета
-    Serial.println("Creating turnstile system...");
     turnstile = new Turnstile(rfidEntry, rfidExit, display, door, distanceSensor, idStorage, logger);
-    turnstile->init();
-    
-    Serial.println("Turnstile system ready!");
 }
 
-String serialBuffer = "";
+char serialBuffer[50];
+byte serialPos = 0;
 
 void loop() {
     // Обработка команды из Serial
     while (Serial.available()) {
         char c = Serial.read();
-        if (c == '\n') {
-            if (serialBuffer.length() > 0) {
-                commandHandler->handleCommand(serialBuffer);
-                serialBuffer = "";
+        if (c == '\n' || c == '\r') {
+            if (serialPos > 0) {
+                serialBuffer[serialPos] = 0;
+                IDStorage::handleCommand(serialBuffer, idStorage, logger);
+                serialPos = 0;
             }
-        } else if (c >= 32 && c <= 126) {  // Печатные символы
-            serialBuffer += c;
+        } else if (c >= 32 && c <= 126 && serialPos < 49) {
+            if (c != ' ' || serialPos > 0) {
+                serialBuffer[serialPos++] = c;
+            }
         }
     }
     
