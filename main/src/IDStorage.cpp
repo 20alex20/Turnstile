@@ -13,16 +13,16 @@ bool IDStorage::isIDAllowed(byte* uid, byte uidSize) {
     if (!file) {
         return false;
     }
-    
+
     while (file.available()) {
         // Читаем размер следующего ID
         byte idSize = file.read();
-        
+
         if (idSize == 0 || idSize > 10) {
             // Некорректный размер
             break;
         }
-        
+
         // Читаем сам ID
         byte fileID[10];
         for (byte i = 0; i < idSize; i++) {
@@ -32,14 +32,14 @@ bool IDStorage::isIDAllowed(byte* uid, byte uidSize) {
             }
             fileID[i] = file.read();
         }
-        
+
         // Проверяем, совпадает ли ID
         if (idSize == uidSize && compareIDs(fileID, uid, idSize)) {
             file.close();
             return true;
         }
     }
-    
+
     file.close();
     return false;
 }
@@ -57,12 +57,12 @@ bool IDStorage::addID(byte* uid, byte uidSize) {
     if (isIDAllowed(uid, uidSize)) {
         return false; // ID уже существует
     }
-    
+
     File file = SD.open(filename, FILE_WRITE);
     if (!file) {
         return false;
     }
-    
+
     file.seek(file.size());
     file.write(uidSize);
     file.write(uid, uidSize);

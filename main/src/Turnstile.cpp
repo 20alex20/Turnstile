@@ -10,11 +10,7 @@ Turnstile::Turnstile(RFIDReader* rfidEntry, RFIDReader* rfidExit,
     this->distanceSensor = distanceSensor;
     this->idStorage = idStorage;
     this->logger = logger;
-    this->state = STATE_WAITING;
-    this->stateStartTime = 0;
     this->lastDistanceMeasureTime = 0;
-    this->baseDistance = 0;
-    this->state = STATE_WAITING;
     this->uidSize = 0;
 
     // Инициализация дисплея
@@ -30,7 +26,7 @@ Turnstile::Turnstile(RFIDReader* rfidEntry, RFIDReader* rfidExit,
     baseDistance = distanceSensor->calibrate();
 
     // Установить начальное состояние
-    stateStartTime = millis();
+    setState(STATE_WAITING);
 }
 
 void Turnstile::loop() {
@@ -96,17 +92,19 @@ void Turnstile::handlePassageWaiting() {
         door->closeDoor();
         return;
     }
-    
+
     // Проверяем проход каждые 10 мс
     checkPassage();
 }
 
 void Turnstile::handlePassageDetected() {
+    unsigned long elapsed = millis() - stateStartTime;
+
     // Измеряем расстояние каждые 10 мс
     checkPassage();
-    
+
     // Проверяем, не истекло ли время ожидания
-    if (millis() - stateStartTime >= TIMER_PASSAGE_DETECTED) {
+    if (elapsed >= TIMER_PASSAGE_DETECTED) {
         // Проход завершен, логируем успешный проход
         logger->log(uid, uidSize, true, direction == DIR_ENTRY, true);
         setState(STATE_CLOSING);

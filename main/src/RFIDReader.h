@@ -15,7 +15,7 @@ private:
      * Остановка чтения карты
      */
     void stopReading();
-    
+
 public:
     /**
      * Конструктор
@@ -23,7 +23,7 @@ public:
      * @param rstPin - пин Reset
      */
     RFIDReader(uint8_t ssPin, uint8_t rstPin);
-    
+
     /**
      * Чтение ID карты
      * @param uid - массив для записи UID (до 10 байт)

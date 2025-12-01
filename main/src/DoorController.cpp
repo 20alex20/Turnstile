@@ -1,6 +1,6 @@
 #include "DoorController.h"
 
-DoorController::DoorController(uint8_t pin) : pin(pin) {
+DoorController::DoorController(uint8_t pin) {
     servo.attach(pin);
 }
 

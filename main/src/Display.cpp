@@ -9,11 +9,11 @@ Display::Display(uint8_t csPin, uint8_t cdPin, uint8_t wrPin, uint8_t resetPin) 
 void Display::init() {
     // Сброс дисплея
     tft->reset();
-    
+
     // Инициализация дисплея
     tft->begin(0x9341);
     tft->setRotation(1);
-    
+
     // Очистка экрана голубым цветом
     tft->fillScreen(COLOR_BLUE);
 }
@@ -23,9 +23,9 @@ void Display::showWaitingMessage() {
     tft->setCursor(40, 100);
     tft->setTextColor(COLOR_WHITE);
     tft->setTextSize(3);
-    tft->print(F("  Приложите"));
+    tft->println(F("  Приложите"));
     tft->setCursor(40, 150);
-    tft->print(F("     карту"));
+    tft->println(F("     карту"));
 }
 
 void Display::showWelcomeMessage() {
@@ -33,9 +33,9 @@ void Display::showWelcomeMessage() {
     tft->setCursor(30, 100);
     tft->setTextColor(COLOR_BLACK);
     tft->setTextSize(3);
-    tft->print(F("Добро"));
+    tft->println(F("Добро"));
     tft->setCursor(30, 150);
-    tft->print(F("пожаловать"));
+    tft->println(F("пожаловать"));
 }
 
 void Display::showGoodbyeMessage() {
@@ -43,9 +43,9 @@ void Display::showGoodbyeMessage() {
     tft->setCursor(30, 100);
     tft->setTextColor(COLOR_BLACK);
     tft->setTextSize(3);
-    tft->print(F("До"));
+    tft->println(F("До"));
     tft->setCursor(20, 150);
-    tft->print(F("свидания"));
+    tft->println(F("свидания"));
 }
 
 void Display::showAccessDeniedMessage() {
@@ -53,9 +53,9 @@ void Display::showAccessDeniedMessage() {
     tft->setCursor(20, 100);
     tft->setTextColor(COLOR_WHITE);
     tft->setTextSize(2);
-    tft->print(F("Проход"));
+    tft->println(F("Проход"));
     tft->setCursor(30, 130);
-    tft->print(F("запрещен"));
+    tft->println(F("запрещен"));
 }
 
 void Display::showNoPassageMessage() {
@@ -63,7 +63,7 @@ void Display::showNoPassageMessage() {
     tft->setCursor(5, 100);
     tft->setTextColor(COLOR_BLACK);
     tft->setTextSize(2);
-    tft->print(F("Проход не"));
+    tft->println(F("Проход не"));
     tft->setCursor(5, 130);
-    tft->print(F("был осуществлен"));
+    tft->println(F("был осуществлен"));
 }

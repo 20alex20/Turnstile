@@ -13,7 +13,7 @@ float DistanceSensor::measureDistance() {
     digitalWrite(trigPin, HIGH);
     delayMicroseconds(10);
     digitalWrite(trigPin, LOW);
-    
+
     // Измеряем время прихода эха
     // Рассчитываем расстояние (скорость звука 343 м/с)
     return pulseIn(echoPin, HIGH) * 0.01715;
@@ -23,7 +23,7 @@ float DistanceSensor::calibrate() {
     // Делаем несколько измерений и берем среднее
     float sum = 0;
     int count = 0;
-    
+
     for (int i = 0; i < 10; i++) {
         float dist = measureDistance();
         if (dist > 0) {
@@ -32,7 +32,7 @@ float DistanceSensor::calibrate() {
         }
         delay(10);
     }
-    
+
     if (count > 0) {
         return sum / count;
     }

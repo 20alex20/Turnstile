@@ -45,53 +45,53 @@ private:
     unsigned long stateStartTime;           // Время входа в текущее состояние
     unsigned long lastDistanceMeasureTime;  // Время последнего измерения расстояния
     float baseDistance;                     // Базовая ширина прохода
-    
+
     TurnstileState state;
     Direction direction;
-    
+
     // Информация о текущей карте для логирования
     byte uid[10];
     byte uidSize;
-    
+
     // Таймеры для различных состояний
     static const unsigned long TIMER_PASSAGE = 15000;           // 15 сек на проход
     static const unsigned long TIMER_CLOSING = 5000;            // 5 сек на закрытие
     static const unsigned long TIMER_PASSAGE_DETECTED = 1000;   // 1 сек после детектирования прохода
     static const unsigned long DISTANCE_MEASURE_INTERVAL = 10;  // Интервал измерения расстояния (10 мс)
 
-    
+
     /**
      * Обработка состояния "Ожидание"
      */
     void handleWaiting();
-    
+
     /**
      * Обработка состояния "Ожидание прохода"
      */
     void handlePassageWaiting();
-    
+
     /**
      * Обработка состояния "Проход детектирован"
      */
     void handlePassageDetected();
-    
+
     /**
      * Обработка состояния "Показ сообщения об ошибке"
      * Обработка состояния "Доступ запрещен"
      * Обработка состояния "Закрытие двери"
      */
     void handleClosing();
-    
+
     /**
      * Переход в состояние
      */
     void setState(TurnstileState newState);
-    
+
     /**
      * Проверка прохода человека
      */
     void checkPassage();
-    
+
 public:
     /**
      * Конструктор
@@ -99,7 +99,7 @@ public:
     Turnstile(RFIDReader* rfidEntry, RFIDReader* rfidExit, 
               Display* display, DoorController* door,
               DistanceSensor* distanceSensor, IDStorage* idStorage, Logger* logger);
-    
+
     /**
      * Основной цикл обработки
      */

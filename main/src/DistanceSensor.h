@@ -10,7 +10,7 @@ class DistanceSensor {
 private:
     uint8_t trigPin;
     uint8_t echoPin;
-    
+
 public:
     /**
      * Конструктор
@@ -18,13 +18,13 @@ public:
      * @param echoPin - пин для приема сигнала
      */
     DistanceSensor(uint8_t trigPin, uint8_t echoPin);
-    
+
     /**
      * Измерение расстояния
      * @return расстояние в см (0 если ошибка)
      */
     float measureDistance();
-    
+
     /**
      * Инициализация ширины прохода
      * Измеряет базовое расстояние при старте
