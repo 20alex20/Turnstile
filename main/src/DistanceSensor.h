@@ -23,13 +23,13 @@ public:
      * Измерение расстояния
      * @return расстояние в см (0 если ошибка)
      */
-    float measureDistance();
+    unsigned long measureDistance();
 
     /**
      * Инициализация ширины прохода
      * Измеряет базовое расстояние при старте
      */
-    float calibrate();
+    unsigned long calibrate();
 };
 
 #endif

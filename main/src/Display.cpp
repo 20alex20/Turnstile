@@ -12,58 +12,49 @@ void Display::init() {
 
     // Инициализация дисплея
     tft->begin(0x9341);
-    tft->setRotation(1);
+    tft->setRotation(3);
 
     // Очистка экрана голубым цветом
     tft->fillScreen(COLOR_BLUE);
+
+    tft->setTextSize(3);
 }
 
 void Display::showWaitingMessage() {
     tft->fillScreen(COLOR_BLUE);
-    tft->setCursor(40, 100);
     tft->setTextColor(COLOR_WHITE);
-    tft->setTextSize(3);
-    tft->println(F("  Приложите"));
-    tft->setCursor(40, 150);
-    tft->println(F("     карту"));
+    tft->setCursor(30, 100);
+    tft->print(F("Attach a card"));
 }
 
 void Display::showWelcomeMessage() {
     tft->fillScreen(COLOR_GREEN);
-    tft->setCursor(30, 100);
     tft->setTextColor(COLOR_BLACK);
-    tft->setTextSize(3);
-    tft->println(F("Добро"));
-    tft->setCursor(30, 150);
-    tft->println(F("пожаловать"));
+    tft->setCursor(30, 100);
+    tft->print(F("Welcome"));
 }
 
 void Display::showGoodbyeMessage() {
     tft->fillScreen(COLOR_GREEN);
-    tft->setCursor(30, 100);
     tft->setTextColor(COLOR_BLACK);
-    tft->setTextSize(3);
-    tft->println(F("До"));
-    tft->setCursor(20, 150);
-    tft->println(F("свидания"));
+    tft->setCursor(30, 100);
+    tft->print(F("Goodbye"));
 }
 
 void Display::showAccessDeniedMessage() {
     tft->fillScreen(COLOR_RED);
-    tft->setCursor(20, 100);
     tft->setTextColor(COLOR_WHITE);
-    tft->setTextSize(2);
-    tft->println(F("Проход"));
+    tft->setCursor(30, 100);
+    tft->print(F("Passage is"));
     tft->setCursor(30, 130);
-    tft->println(F("запрещен"));
+    tft->print(F("prohibited"));
 }
 
 void Display::showNoPassageMessage() {
     tft->fillScreen(COLOR_YELLOW);
-    tft->setCursor(5, 100);
     tft->setTextColor(COLOR_BLACK);
-    tft->setTextSize(2);
-    tft->println(F("Проход не"));
-    tft->setCursor(5, 130);
-    tft->println(F("был осуществлен"));
+    tft->setCursor(30, 100);
+    tft->print(F("The passage was"));
+    tft->setCursor(30, 130);
+    tft->print(F("not carried out"));
 }

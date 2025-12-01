@@ -55,11 +55,13 @@ bool IDStorage::compareIDs(const byte* id1, const byte* id2, byte size) {
 
 bool IDStorage::addID(byte* uid, byte uidSize) {
     if (isIDAllowed(uid, uidSize)) {
+Serial.println("ffff");
         return false; // ID уже существует
     }
 
     File file = SD.open(filename, FILE_WRITE);
     if (!file) {
+Serial.println("ggggg");
         return false;
     }
 

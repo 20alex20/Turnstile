@@ -50,7 +50,7 @@ void setup() {
     display = new Display(LCD_CS, LCD_CD, LCD_WR, LCD_RESET);
 
     // Инициализация SD карты
-    idStorage = new IDStorage("ids.data", SD_CS);
+    idStorage = new IDStorage("ids.txt", SD_CS);
     if (!idStorage->init()) {
         while (1); // Остановка программы
     }

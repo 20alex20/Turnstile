@@ -8,33 +8,24 @@ DistanceSensor::DistanceSensor(uint8_t trigPin, uint8_t echoPin) {
     digitalWrite(trigPin, LOW);
 }
 
-float DistanceSensor::measureDistance() {
+unsigned long DistanceSensor::measureDistance() {
     // Отправляем короткий импульс
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(10);
     digitalWrite(trigPin, HIGH);
     delayMicroseconds(10);
     digitalWrite(trigPin, LOW);
 
     // Измеряем время прихода эха
-    // Рассчитываем расстояние (скорость звука 343 м/с)
-    return pulseIn(echoPin, HIGH) * 0.01715;
+    unsigned long j = pulseIn(echoPin, HIGH);
+    Serial.println(j);
+    return j;
 }
 
-float DistanceSensor::calibrate() {
-    // Делаем несколько измерений и берем среднее
-    float sum = 0;
-    int count = 0;
-
-    for (int i = 0; i < 10; i++) {
-        float dist = measureDistance();
-        if (dist > 0) {
-            sum += dist;
-            count++;
-        }
-        delay(10);
+unsigned long DistanceSensor::calibrate() {
+    unsigned long dist = 0;
+    while (dist == 0) {
+        dist = measureDistance();
     }
-
-    if (count > 0) {
-        return sum / count;
-    }
-    return 0;
+    return dist;
 }

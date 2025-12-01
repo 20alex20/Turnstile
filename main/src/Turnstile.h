@@ -25,6 +25,7 @@ enum TurnstileState {
  * Направление движения
  */
 enum Direction {
+    DIR_BLOCK,
     DIR_ENTRY,      // Вход (передний RFID)
     DIR_EXIT        // Выход (задний RFID)
 };
@@ -44,7 +45,7 @@ private:
 
     unsigned long stateStartTime;           // Время входа в текущее состояние
     unsigned long lastDistanceMeasureTime;  // Время последнего измерения расстояния
-    float baseDistance;                     // Базовая ширина прохода
+    unsigned long baseDistance;             // Базовая ширина прохода
 
     TurnstileState state;
     Direction direction;

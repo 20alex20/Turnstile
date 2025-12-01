@@ -1,7 +1,7 @@
 #include "Logger.h"
 #include <SD.h>
 
-Logger::Logger(const char* fn) : filename(fn), startMillis(0), serialLogging(false) {
+Logger::Logger(const char* fn) : filename(fn), startMillis(0) {
     startTime.day = 1;
     startTime.month = 1;
     startTime.year = 2025;
@@ -124,34 +124,28 @@ void Logger::log(byte* uid, byte size, bool allowed, bool entry, bool passed) {
     buf[p++] = ':';
     buf[p++] = ' ';
     if (entry) {
-        strcpy_P(buf + p, PSTR("Вход "));
-        p += 5;
+        strcpy_P(buf + p, PSTR("Entrance "));
+        p += 9;
     } else {
-        strcpy_P(buf + p, PSTR("Выход "));
-        p += 6;
+        strcpy_P(buf + p, PSTR("Exit "));
+        p += 5;
     }
     if (allowed) {
-        strcpy_P(buf + p, PSTR("разрешен"));
-        p += 8;
+        strcpy_P(buf + p, PSTR("is allowed"));
+        p += 10;
         if (!passed) {
-            buf[p++] = ' ';
-            strcpy_P(buf + p, PSTR("НЕ ПРОШЕЛ"));
+            strcpy_P(buf + p, PSTR(" NOT PASS"));
             p += 10;
         }
     } else {
-        strcpy_P(buf + p, PSTR("запрещен"));
-        p += 8;
+        strcpy_P(buf + p, PSTR("is prohibited"));
+        p += 13;
     }
     buf[p] = 0;
-    if (serialLogging) Serial.println(buf);
     File f = SD.open(filename, FILE_WRITE);
     if (f) {
         f.seek(f.size());
         f.println(buf);
         f.close();
     }
-}
-
-void Logger::setSerialLogging(bool en) {
-    serialLogging = en;
 }

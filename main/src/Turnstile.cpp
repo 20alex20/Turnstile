@@ -11,6 +11,7 @@ Turnstile::Turnstile(RFIDReader* rfidEntry, RFIDReader* rfidExit,
     this->idStorage = idStorage;
     this->logger = logger;
     this->lastDistanceMeasureTime = 0;
+    this->direction = DIR_BLOCK;
     this->uidSize = 0;
 
     // Инициализация дисплея
@@ -23,7 +24,7 @@ Turnstile::Turnstile(RFIDReader* rfidEntry, RFIDReader* rfidExit,
     door->closeDoor();
 
     // Калибровать дальномер
-    baseDistance = distanceSensor->calibrate();
+    baseDistance = distanceSensor->calibrate() * 95UL / 100UL;
 
     // Установить начальное состояние
     setState(STATE_WAITING);
@@ -54,25 +55,25 @@ void Turnstile::setState(TurnstileState newState) {
 }
 
 void Turnstile::handleWaiting() {
-    bool cardReady = false;
-
     // Проверяем передний RFID (вход)
     if (rfidEntry->readCardID(uid, uidSize)) {
         direction = DIR_ENTRY;
-        cardReady = false;
-        door->openForEntry();
     }
     // Проверяем задний RFID (выход)
     else if (rfidExit->readCardID(uid, uidSize)) {
         direction = DIR_EXIT;
-        cardReady = false;
-        door->openForExit();
     }
 
-    if (cardReady) {
+    if (direction != DIR_BLOCK) {
         if (idStorage->isIDAllowed(uid, uidSize)) {
             setState(STATE_PASSAGE_WAITING);
-            display->showGoodbyeMessage();
+            if (direction == DIR_ENTRY) {
+                door->openForEntry();
+                display->showWelcomeMessage();
+            } else {
+                display->showGoodbyeMessage();
+                door->openForExit();
+            }
         } else {
             // Логируем "Проход запрещен"
             logger->log(uid, uidSize, false, direction == DIR_ENTRY, false);
@@ -118,17 +119,18 @@ void Turnstile::handleClosing() {
         // Время показа сообщения истекло
         // Время на закрытие истекло, возвращаемся в режим ожидания
         setState(STATE_WAITING);
+        direction = DIR_BLOCK;
         display->showWaitingMessage();
     }
 }
 
 void Turnstile::checkPassage() {
     if (millis() - lastDistanceMeasureTime >= DISTANCE_MEASURE_INTERVAL) {
-        float currentDistance = distanceSensor->measureDistance();
+        unsigned long currentDistance = distanceSensor->measureDistance();
 
         // Проверяем, уменьшилось ли расстояние от базового
         // Человек проходит, когда расстояние становится меньше базового
-        if (currentDistance > 0 && currentDistance < baseDistance * 0.95) {
+        if (currentDistance > 0L && currentDistance < baseDistance) {
             // Обнаружен проход - человек вошел в зону
             setState(STATE_PASSAGE_DETECTED);
         }

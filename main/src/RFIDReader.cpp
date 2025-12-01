@@ -6,7 +6,7 @@ RFIDReader::RFIDReader(uint8_t ssPin, uint8_t rstPin) {
 }
 
 bool RFIDReader::readCardID(byte* uid, byte& uidSize) {
-    if (!reader->PICC_ReadCardSerial()) {
+    if (!reader->PICC_IsNewCardPresent() || !reader->PICC_ReadCardSerial()) {
         return false;
     }
 

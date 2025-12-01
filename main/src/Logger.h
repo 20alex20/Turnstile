@@ -13,7 +13,6 @@ private:
     const char* _filename;
     DateTime startTime;
     unsigned long startMillis;
-    bool serialLogging;
     byte fmtDT(const DateTime& dt, char* buf);
     byte fmtID(byte* uid, byte size, char* buf);
     void getDT(DateTime& dt);
