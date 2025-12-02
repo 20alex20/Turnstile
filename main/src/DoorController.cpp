@@ -2,6 +2,7 @@
 
 DoorController::DoorController(uint8_t pin) {
     servo.attach(pin);
+    closeDoor();
 }
 
 void DoorController::openForEntry() {

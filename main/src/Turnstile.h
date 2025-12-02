@@ -16,16 +16,15 @@ enum TurnstileState {
     STATE_WAITING,              // Ожидание карты
     STATE_PASSAGE_WAITING,      // Ожидание прохода (15 сек)
     STATE_PASSAGE_DETECTED,     // Проход детектирован (1 сек)
-    STATE_CLOSING,              // Закрытие двери (5 сек)
-    STATE_ERROR_MESSAGE,        // Показ сообщения об ошибке (5 сек)
-    STATE_ACCESS_DENIED         // Показ "Проход запрещен" (5 сек)
+    STATE_CLOSING,              // Закрытие двери или показ сообщения (5 сек)
+    STATE_MESSAGE,              // Показ сообщения (5 сек)
 };
 
 /**
  * Направление движения
  */
 enum Direction {
-    DIR_BLOCK,
+    DIR_BLOCK,      // Закрыто
     DIR_ENTRY,      // Вход (передний RFID)
     DIR_EXIT        // Выход (задний RFID)
 };
@@ -45,7 +44,7 @@ private:
 
     unsigned long stateStartTime;           // Время входа в текущее состояние
     unsigned long lastDistanceMeasureTime;  // Время последнего измерения расстояния
-    unsigned long baseDistance;             // Базовая ширина прохода
+    unsigned int baseDistance;              // Базовая ширина прохода
 
     TurnstileState state;
     Direction direction;
@@ -56,10 +55,10 @@ private:
 
     // Таймеры для различных состояний
     static const unsigned long TIMER_PASSAGE = 15000;           // 15 сек на проход
-    static const unsigned long TIMER_CLOSING = 5000;            // 5 сек на закрытие
+    static const unsigned long TIMER_CLOSING = 1000;            // 5 сек на закрытие
+    static const unsigned long TIMER_MESSAGE = 4000;            // 5 сек на сообщение
     static const unsigned long TIMER_PASSAGE_DETECTED = 1000;   // 1 сек после детектирования прохода
     static const unsigned long DISTANCE_MEASURE_INTERVAL = 10;  // Интервал измерения расстояния (10 мс)
-
 
     /**
      * Обработка состояния "Ожидание"
@@ -77,11 +76,14 @@ private:
     void handlePassageDetected();
 
     /**
-     * Обработка состояния "Показ сообщения об ошибке"
-     * Обработка состояния "Доступ запрещен"
      * Обработка состояния "Закрытие двери"
      */
     void handleClosing();
+
+    /**
+     * Обработка состояния "Показ сообщения"
+     */
+    void handleMessage();
 
     /**
      * Переход в состояние

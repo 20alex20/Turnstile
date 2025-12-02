@@ -11,11 +11,11 @@ class DoorController {
 private:
     Servo servo;
 
-public:
-    static const uint8_t POS_CLOSED = 90;      // Закрыто
-    static const uint8_t POS_OPENED_IN = 0;    // Открыто для входа
-    static const uint8_t POS_OPENED_OUT = 180; // Открыто для выхода
+    static const uint8_t POS_CLOSED = 75;      // Закрыто
+    static const uint8_t POS_OPENED_IN = 5;    // Открыто для входа
+    static const uint8_t POS_OPENED_OUT = 160; // Открыто для выхода
 
+public:
     /**
      * Конструктор
      * @param pin - пин для подключения сервопривода

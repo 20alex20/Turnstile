@@ -55,13 +55,10 @@ bool IDStorage::compareIDs(const byte* id1, const byte* id2, byte size) {
 
 bool IDStorage::addID(byte* uid, byte uidSize) {
     if (isIDAllowed(uid, uidSize)) {
-Serial.println("ffff");
         return false; // ID уже существует
     }
-
     File file = SD.open(filename, FILE_WRITE);
     if (!file) {
-Serial.println("ggggg");
         return false;
     }
 
@@ -141,8 +138,6 @@ void IDStorage::handleCommand(const char* cmd, IDStorage* s, Logger* l) {
                 Serial.println(buf);
             }
             f.close();
-        } else {
-            Serial.println(F("Logs file not found"));
         }
     } else if (strcmp_P(cmd, PSTR("get ids")) == 0) {
         s->printAllIDs();
@@ -159,7 +154,14 @@ void IDStorage::handleCommand(const char* cmd, IDStorage* s, Logger* l) {
     } else if (strcmp_P(cmd, PSTR("clear ids")) == 0) {
         SD.remove(s->filename);
         Serial.println(F("OK"));
+    } else if (strcmp_P(cmd, PSTR("serial enable")) == 0) {
+        l->setSerialLogging(true);
+        Serial.println(F("OK"));
+    } else if (strcmp_P(cmd, PSTR("serial disable")) == 0) {
+        l->setSerialLogging(false);
+        Serial.println(F("OK"));
     } else {
         Serial.println(F("ERROR: Unknown command"));
     }
+    Serial.println();
 }

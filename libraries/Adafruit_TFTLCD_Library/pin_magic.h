@@ -137,8 +137,8 @@
     uint8_t data = (d);                                                        \
     for (uint8_t i = 0; i < 8; i++) {                                          \
       PORTC = (PORTC & B11111110) | (data >> 7); /* Set PC0 (A0) */            \
-      PORTB |= B00000010;    /* Set PB1 (pin 9) HIGH */                        \
-      PORTB &= B11111101;    /* Set PB1 (pin 9) LOW */                         \
+      PORTC |= B00100000;    /* Set PB1 (pin 9) HIGH */                        \
+      PORTC &= B11011111;    /* Set PB1 (pin 9) LOW */                         \
       data <<= 1;                                                              \
     }                                                                          \
     PORTB |= B00000001;      /* Set PB0 (pin 8) HIGH */                        \
@@ -151,10 +151,10 @@
   }
 #define setWriteDirInline()                                                    \
   {                                                                            \
-    DDRC |= B00100000;      /* Set PC5 (A5) as output */                       \
-    DDRB |= B00000011;      /* Set PB0 (pin 8) and PB1 (pin 9) as outputs */   \
-    PORTC &= B11011111;     /* Set PC5 LOW */                                  \
-    PORTB &= B11111100;     /* Set PB0 and PB1 LOW */                          \
+    DDRC |= B00100001;      /* Set PC5 (A5) as output */                       \
+    DDRB |= B00000001;      /* Set PB0 (pin 8) and PB1 (pin 9) as outputs */   \
+    PORTC &= B11011110;     /* Set PC5 LOW */                                  \
+    PORTB &= B11111110;     /* Set PB0 and PB1 LOW */                          \
   }
 #define setReadDirInline()                                                     \
   {                                                                            \

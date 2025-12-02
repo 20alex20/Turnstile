@@ -1,9 +1,9 @@
 #include "Display.h"
 
-#define LCD_RD A0
+#define DISABLED_LCD_RD A0
 
 Display::Display(uint8_t csPin, uint8_t cdPin, uint8_t wrPin, uint8_t resetPin) {
-    tft = new Adafruit_TFTLCD(csPin, cdPin, wrPin, LCD_RD, resetPin);
+    tft = new Adafruit_TFTLCD(csPin, cdPin, wrPin, DISABLED_LCD_RD, resetPin);
 }
 
 void Display::init() {
@@ -13,10 +13,6 @@ void Display::init() {
     // Инициализация дисплея
     tft->begin(0x9341);
     tft->setRotation(3);
-
-    // Очистка экрана голубым цветом
-    tft->fillScreen(COLOR_BLUE);
-
     tft->setTextSize(3);
 }
 

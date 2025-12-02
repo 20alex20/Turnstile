@@ -1,7 +1,7 @@
 #include "Logger.h"
 #include <SD.h>
 
-Logger::Logger(const char* fn) : filename(fn), startMillis(0) {
+Logger::Logger(const char* fn) : filename(fn), startMillis(0), serialLogging(false) {
     startTime.day = 1;
     startTime.month = 1;
     startTime.year = 2025;
@@ -142,10 +142,18 @@ void Logger::log(byte* uid, byte size, bool allowed, bool entry, bool passed) {
         p += 13;
     }
     buf[p] = 0;
+    if (serialLogging) {
+        Serial.println(buf);
+        Serial.println();
+    }
     File f = SD.open(filename, FILE_WRITE);
     if (f) {
         f.seek(f.size());
         f.println(buf);
         f.close();
     }
+}
+
+void Logger::setSerialLogging(bool en) {
+    serialLogging = en;
 }

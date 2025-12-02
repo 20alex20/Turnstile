@@ -24,7 +24,7 @@
 #define ECHO_PIN 2
 
 // Пин для сервопривода
-#define SERVO_PIN A5
+#define SERVO_PIN 9
 
 // Пин для SD карты (через шилд)
 #define SD_CS 10
@@ -71,6 +71,10 @@ void setup() {
 
     // Создание и инициализация турникета
     turnstile = new Turnstile(rfidEntry, rfidExit, display, door, distanceSensor, idStorage, logger);
+
+    while (Serial.available()) {
+        Serial.read();
+    }
 }
 
 char serialBuffer[50];
@@ -83,6 +87,7 @@ void loop() {
         if (c == '\n' || c == '\r') {
             if (serialPos > 0) {
                 serialBuffer[serialPos] = 0;
+                Serial.println(serialBuffer);
                 IDStorage::handleCommand(serialBuffer, idStorage, logger);
                 serialPos = 0;
             }
