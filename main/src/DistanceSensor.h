@@ -9,10 +9,9 @@
 class DistanceSensor {
 private:
     byte trigPin;
+    byte echoPin;
 
 public:
-    static const uint8_t MAX_DISTANCE = 200;
-
     /**
      * Конструктор
      * @param trigPin - пин для передачи сигнала

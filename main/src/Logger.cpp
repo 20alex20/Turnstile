@@ -11,7 +11,8 @@ Logger::Logger(const char* fn) : filename(fn), startMillis(0), serialLogging(fal
 }
 
 void Logger::requestDateTime() {
-    Serial.println(F("Enter date/time (DD.MM.YYYY HH:MM:SS):\n> "));
+    Serial.println(F("Enter date/time (DD.MM.YYYY HH:MM:SS):"));
+    Serial.println();
     while (!Serial.available()) delay(10);
     char buf[30];
     byte idx = 0;
