@@ -9,8 +9,8 @@
 class DoorController {
 private:
     static const uint8_t POS_CLOSED = 75;      // Закрыто
-    static const uint8_t POS_OPENED_IN = 10;    // Открыто для входа
-    static const uint8_t POS_OPENED_OUT = 160; // Открыто для выхода
+    static const uint8_t POS_OPENED_IN = 15;    // Открыто для входа
+    static const uint8_t POS_OPENED_OUT = 155; // Открыто для выхода
 
     void write(uint8_t angle);
 

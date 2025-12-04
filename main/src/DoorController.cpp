@@ -1,7 +1,6 @@
 #include "DoorController.h"
 
 DoorController::DoorController(uint8_t pin) {
-    closeDoor();
     pinMode(pin, OUTPUT);
 }
 

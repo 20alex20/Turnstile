@@ -136,13 +136,13 @@
   {                                                                            \
     uint8_t data = (d);                                                        \
     for (uint8_t i = 0; i < 8; i++) {                                          \
-      PORTC = (PORTC & B11111110) | (data >> 7); /* Set PC0 (A0) */            \
+      PORTB = (PORTB & B11111110) | (data >> 7); /* Set PC0 (A0) */            \
       PORTC |= B00100000;    /* Set PB1 (pin 9) HIGH */                        \
       PORTC &= B11011111;    /* Set PB1 (pin 9) LOW */                         \
       data <<= 1;                                                              \
     }                                                                          \
-    PORTB |= B00000001;      /* Set PB0 (pin 8) HIGH */                        \
-    PORTB &= B11111110;      /* Set PB0 (pin 8) LOW */                         \
+    PORTC |= B00000001;      /* Set PB0 (pin 8) HIGH */                        \
+    PORTC &= B11111110;      /* Set PB0 (pin 8) LOW */                         \
     WR_STROBE;                                                                 \
   }
 #define read8inline(result)                                                    \

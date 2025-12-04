@@ -17,6 +17,8 @@ Turnstile::Turnstile(RFIDReader* rfidEntry, RFIDReader* rfidExit,
     // Калибровать дальномер
     baseDistance = distanceSensor->calibrate() * 9UL / 10UL;
 
+	door->closeDoor();
+
     // Инициализация дисплея
     display->init();
 
