@@ -47,6 +47,14 @@ public:
     bool addID(byte* uid, byte uidSize);
 
     /**
+     * Удалить ID из файла
+     * @param uid - массив с UID
+     * @param size - размер UID
+     * @return true, если успешно удален
+    */
+    bool removeID(byte* uid, byte size);
+
+    /**
      * Вывести все ID из файла
      */
     void printAllIDs();

@@ -69,6 +69,55 @@ bool IDStorage::addID(byte* uid, byte uidSize) {
     return true;
 }
 
+bool IDStorage::removeID(byte* uid, byte size) {
+    File f = SD.open(filename, FILE_READ);
+    if (!f) return false;
+    char tmp[20];
+    strcpy(tmp, filename);
+    strcpy_P(tmp + strlen(filename) - 4, PSTR("_tmp.txt"));
+    File tf = SD.open(tmp, FILE_WRITE);
+    if (!tf) {
+        f.close();
+        return false;
+    }
+    bool found = false;
+    while (f.available()) {
+        byte idSize = f.read();
+        if (idSize == 0 || idSize > 10) break;
+        byte fileID[10];
+        for (byte i = 0; i < idSize; i++) {
+            if (!f.available()) {
+                f.close();
+                tf.close();
+                return false;
+            }
+            fileID[i] = f.read();
+        }
+        if (idSize != size || !compareIDs(fileID, uid, size)) {
+            tf.write(idSize);
+            tf.write(fileID, idSize);
+        } else {
+            found = true;
+        }
+    }
+    f.close();
+    tf.close();
+    if (found) {
+        SD.remove(filename);
+        File f2 = SD.open(filename, FILE_WRITE);
+        if (f2) {
+            File tf2 = SD.open(tmp, FILE_READ);
+            if (tf2) {
+                while (tf2.available()) f2.write(tf2.read());
+                tf2.close();
+            }
+            f2.close();
+        }
+    }
+    SD.remove(tmp);
+    return found;
+}
+
 void IDStorage::printAllIDs() {
     File f = SD.open(filename, FILE_READ);
     if (!f) return;
@@ -141,12 +190,19 @@ void IDStorage::handleCommand(const char* cmd, IDStorage* s, Logger* l) {
         }
     } else if (strcmp_P(cmd, PSTR("get ids")) == 0) {
         s->printAllIDs();
-    } else if (strncmp_P(cmd, PSTR("put "), 4) == 0) {
+    } else if (strncmp_P(cmd, PSTR("add "), 4) == 0) {
         byte uid[10], size;
         if (parseCardID(cmd + 4, uid, size)) {
             Serial.println(s->addID(uid, size) ? F("OK") : F("ERROR: ID already exists"));
         } else {
             Serial.println(F("ERROR: Invalid ID format"));
+        }
+    } else if (strncmp_P(cmd, PSTR("remove "), 7) == 0) {
+        byte uid[10], size;
+        if (parseCardID(cmd + 7, uid, size)) {
+            Serial.println(s->removeID(uid, size) ? F("OK") : F("ERROR: ID not found"));
+        } else {
+            Serial.println("ERROR: Invalid ID format");
         }
     } else if (strcmp_P(cmd, PSTR("clear logs")) == 0) {
         SD.remove(l->filename);
